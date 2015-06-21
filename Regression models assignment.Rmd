@@ -4,7 +4,7 @@ author: "Marian Dragt"
 date: "June 19, 2015"
 output: pdf_document
 ---
-**Summary**
+# Summary
 In this report, we will analyze the Motor Trend Car Road Tests (mtcars) data set and explore the relationship between various variables and miles per gallon (MPG). 
 This dataset was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973-74 models). 
 We assumed that there was a difference regarding performance between automatic and manual transmission, and found evidence for this assumption. Results reveal that cars with manual transmission have 7.2 MPG more than cars with automatic transmission.
@@ -20,8 +20,8 @@ In order to quantify these differences, we started with looking of at the effect
 
 Hence, our **conclusion** that manual transmission is better for MPG, but it also depends on the weight of the car, and the 1/4 mile time, besides, the interaction between weight and the manual transmission type has a negative effect on the MPG. So, for light cars, manual tranmission type is better for MPG, but for heavy cars, this assumption is not supported.
 
-#### Appendix
-#### Data source and description
+# Appendix
+## Data source and description
 The Motor Trend Car Road Tests **data** (mtcars) was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973-74 models).
 
 + mpg	 Miles/(US) gallon
@@ -49,7 +49,7 @@ library(GGally)
 data("mtcars")
 attach(mtcars)
 ```
-#### Exploring the data
+## Exploring the data
 Regarding the variable types, we have to transform cyl (Number of cylinders), vs (V/S V-Engine / Straight engine), am (Transmission (0 = automatic, 1 = manual)), gear (Number of forward gears), and carb (Number of carburetors) into factors.
 ```{r echo=FALSE, warning=FALSE,message=FALSE}
 # change types (and save rownames)
@@ -87,21 +87,21 @@ difference <- t.test(mpg ~ am)
 dif_groups <- difference$estimate[2] - difference$estimate[1]
 
 ```
-#### Hypothesis testing
+## Hypothesis testing
 After checking for normality (`r shap0$p.value` and `r shap1$p.value` are both not significant), we conducted a t-test, resulting in a p-value of `r difference$p.value`, so we can conclude that there is a difference between manual and automatic transmission, rejecting the H0 hypothesis. There is a difference between these groups, showing that manual cars have `r dif_groups` more MPG than automatic cars.
 
-#### Exloratory Plots
+## Exloratory Plots
 ```{r, echo=F, warning=F, message=F,fig.height=7}
 mtcars %>% 
   select(mpg, wt,cyl,drat,hp,qsec,carb,gear,am,vs) %>% 
   ggpairs(data=., color = "am", title="stats by transmission type")
-```
 
+```
 Here we see the clear difference in transmission type, as manual cars have on average a higher MPG than automatic cars. Besides, we observe a relation between the transmission type and weight, as automatic cars tend to be heavier and have less MPG than manual cars. Actually, there are patterns in the data for nearly every variablea, accepting some noise.
 
 But if it comes to correlation with MPG, than transmission type is not the best predictor, and probably models with the number of cylinders, weight, horsepower and displacement will do better.
 
-#### Regression Models
+## Regression Models
 ```{r echo=FALSE, warning=FALSE,message=FALSE, results='hide'}
 # test the effect of all variables on MPG
 model_all <- lm(mpg ~ ., data=mtcars)
@@ -141,16 +141,18 @@ This gave a good result, and after deleting the non-significant horsepower, we o
 ``` {r,echo=F,results='asis'}
 print(xtable(summary(model_forward)),floating=FALSE)
 print(xtable(confint(model_forward)),floating=FALSE)
+
 ```
-**Inference and coefficients**
+
+## Inference and coefficients
 Regarding the final model, transmission type, weight, 1/4 mile time and the interaction between weight and transmission type have a significant effect. Looking at the confidence intervals, all confidence intervals are not including zero, confirming significance.
 
-**Residuals and Diagnostics**
+## Residuals and Diagnostics
 ``` {r,echo=FALSE,fig.height=7}
 # forward model
-residualPlots(model_forward,tests=F,cex=.5)
+#residualPlots(model_forward,tests=F,cex=.5)
 ```
-The plots of the residuals seem linear, which is ok. Also the diagnostic plots show normal results with some values diverse from the Normal QQ plot, however not drastically. Regarding the leverage, we see that Maserati Bora has more leverage, but this value is not surpassing the 0.5. 
+The plots of the residuals seem all linear, which is ok. Also the diagnostic plots show normal results with some values diverse from the Normal QQ plot, however not drastically. Regarding the leverage, we see that Maserati Bora has more leverage, but this value is not surpassing the 0.5. 
 
 Comparing our final model with the model with only transmission type, we found evidence, using ANOVA, that our final model is better. We also found that all the predictors of the final model have significance.
 We didn't find outliers in the model, checking the leverage, nor did we found substantial influencers.
